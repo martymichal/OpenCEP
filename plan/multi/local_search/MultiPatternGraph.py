@@ -57,7 +57,7 @@ class MultiPatternGraph:
             return None
         random_max_sub_pattern = random.choice(list(random_max_sub_pattern_set))
         containing_patterns = self.__maximal_sub_pattern_to_patterns.get(random_max_sub_pattern)
-        chosen_patterns = random.sample(containing_patterns, min(neighborhood, len(containing_patterns)))
+        chosen_patterns = random.sample(list(containing_patterns), min(neighborhood, len(containing_patterns)))
         return random_max_sub_pattern, chosen_patterns
 
     def __get_maximal_common_sub_patterns(self, pattern_a: Pattern, pattern_b: Pattern) -> List[Pattern]:

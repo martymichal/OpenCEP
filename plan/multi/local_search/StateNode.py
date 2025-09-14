@@ -68,7 +68,7 @@ class StateNode:
         # create a random sub pattern out of max_sub_pattern
         event_names = set(max_sub_pattern.get_primitive_event_names())
         rand_size = random.randint(0, len(event_names))
-        filtered_events = random.sample(event_names, rand_size)
+        filtered_events = random.sample(list(event_names), rand_size)
         random_sub_pattern = max_sub_pattern.get_sub_pattern(filtered_events)
         if random_sub_pattern is None:
             return None
