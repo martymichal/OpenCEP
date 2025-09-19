@@ -1,10 +1,10 @@
 from test.testUtils import *
-from misc.ConsumptionPolicy import *
+from OpenCEP.misc.ConsumptionPolicy import *
 from datetime import timedelta
-from condition.Condition import Variable
-from condition.BaseRelationCondition import GreaterThanCondition
-from base.PatternStructure import SeqOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition
+from OpenCEP.base.PatternStructure import SeqOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
 
 def singleType1PolicyPatternSearchTest(createTestFile = False):
     """

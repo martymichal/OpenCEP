@@ -1,11 +1,11 @@
 from datetime import timedelta
-from base.Pattern import Pattern
-from transformation.PatternPreprocessingParameters import PatternPreprocessingParameters
-from condition.Condition import TrueCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, NegationOperator, OrOperator
+from OpenCEP.base.Pattern import Pattern
+from OpenCEP.transformation.PatternPreprocessingParameters import PatternPreprocessingParameters
+from OpenCEP.condition.Condition import TrueCondition
+from OpenCEP.base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, NegationOperator, OrOperator
 
-from transformation.PatternTransformationRules import PatternTransformationRules
-from transformation.PatternPreprocessor import PatternPreprocessor
+from OpenCEP.transformation.PatternTransformationRules import PatternTransformationRules
+from OpenCEP.transformation.PatternPreprocessor import PatternPreprocessor
 
 TESTING_PREPROCESSING_RULES_ORDER = [
     PatternTransformationRules.AND_AND_PATTERN,

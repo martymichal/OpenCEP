@@ -1,14 +1,14 @@
 from datetime import timedelta
 
-from adaptive.optimizer.OptimizerFactory import OptimizerParameters
-from adaptive.optimizer.OptimizerTypes import OptimizerTypes
-from base.Pattern import Pattern
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, NegationOperator
-from condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition, GreaterThanEqCondition, \
+from OpenCEP.adaptive.optimizer.OptimizerFactory import OptimizerParameters
+from OpenCEP.adaptive.optimizer.OptimizerTypes import OptimizerTypes
+from OpenCEP.base.Pattern import Pattern
+from OpenCEP.base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, NegationOperator
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition, GreaterThanEqCondition, \
     SmallerThanEqCondition
-from condition.CompositeCondition import AndCondition
-from condition.Condition import Variable
-from plan.multi.MultiPatternTreePlanMergeApproaches import MultiPatternTreePlanMergeApproaches
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.Condition import Variable
+from OpenCEP.plan.multi.MultiPatternTreePlanMergeApproaches import MultiPatternTreePlanMergeApproaches
 from test.testUtils import *
 
 currentPath = pathlib.Path(os.path.dirname(__file__))

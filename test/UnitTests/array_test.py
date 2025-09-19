@@ -1,5 +1,5 @@
 import unittest
-from misc.Utils import ndarray
+from OpenCEP.misc.Utils import ndarray
 import numpy as np
 
 

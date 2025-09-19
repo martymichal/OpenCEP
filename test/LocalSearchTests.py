@@ -1,19 +1,19 @@
 from random import random
 
-from adaptive.optimizer.OptimizerFactory import OptimizerParameters
-from adaptive.optimizer.OptimizerTypes import OptimizerTypes
-from adaptive.statistics.StatisticsCollectorFactory import StatisticsCollectorParameters
-from adaptive.statistics.StatisticsTypes import StatisticsTypes
-from plan.multi.MultiPatternTreePlanMergeApproaches import MultiPatternTreePlanMergeApproaches
-from plan.multi.local_search.LocalSearchFactory import TabuSearchLocalSearchParameters,\
+from OpenCEP.adaptive.optimizer.OptimizerFactory import OptimizerParameters
+from OpenCEP.adaptive.optimizer.OptimizerTypes import OptimizerTypes
+from OpenCEP.adaptive.statistics.StatisticsCollectorFactory import StatisticsCollectorParameters
+from OpenCEP.adaptive.statistics.StatisticsTypes import StatisticsTypes
+from OpenCEP.plan.multi.MultiPatternTreePlanMergeApproaches import MultiPatternTreePlanMergeApproaches
+from OpenCEP.plan.multi.local_search.LocalSearchFactory import TabuSearchLocalSearchParameters,\
     SimulatedAnnealingLocalSearchParameters
 from test.testUtils import *
 from datetime import timedelta
-from condition.Condition import Variable
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition
+from OpenCEP.base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
 
 
 TABU_SEARCH_LOCAL_EVALUATION_MECHANISM_SETTINGS = \

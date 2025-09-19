@@ -1,16 +1,16 @@
-from adaptive.optimizer.OptimizerFactory import OptimizerParameters
-from adaptive.optimizer.OptimizerTypes import OptimizerTypes
+from OpenCEP.adaptive.optimizer.OptimizerFactory import OptimizerParameters
+from OpenCEP.adaptive.optimizer.OptimizerTypes import OptimizerTypes
 from test.testUtils import *
-from plan.LeftDeepTreeBuilders import *
-from plan.BushyTreeBuilders import *
+from OpenCEP.plan.LeftDeepTreeBuilders import *
+from OpenCEP.plan.BushyTreeBuilders import *
 from datetime import timedelta
-from condition.Condition import Variable, TrueCondition, BinaryCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import EqCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator, \
+from OpenCEP.condition.Condition import Variable, TrueCondition, BinaryCondition
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import EqCondition
+from OpenCEP.base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator, \
     NegationOperator
-from base.Pattern import Pattern
-from plan.TreePlanBuilderFactory import IterativeImprovementTreePlanBuilderParameters
+from OpenCEP.base.Pattern import Pattern
+from OpenCEP.plan.TreePlanBuilderFactory import IterativeImprovementTreePlanBuilderParameters
 
 
 def basicNestedTest(createTestFile=False):

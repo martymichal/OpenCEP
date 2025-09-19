@@ -1,11 +1,11 @@
 from test.testUtils import *
 from datetime import timedelta
-from condition.Condition import Variable, SimpleCondition, TrueCondition
-from condition.KCCondition import KCIndexCondition, KCValueCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import SmallerThanCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable, SimpleCondition, TrueCondition
+from OpenCEP.condition.KCCondition import KCIndexCondition, KCValueCondition
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import SmallerThanCondition
+from OpenCEP.base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator
+from OpenCEP.base.Pattern import Pattern
 
 
 def structuralTest1():

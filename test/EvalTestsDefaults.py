@@ -1,12 +1,12 @@
 from datetime import timedelta
-from evaluation.EvaluationMechanismFactory import TreeBasedEvaluationMechanismParameters
-from tree.evaluation.TreeEvaluationMechanismUpdateTypes import TreeEvaluationMechanismUpdateTypes
-from adaptive.optimizer.OptimizerFactory import StatisticsDeviationAwareOptimizerParameters, \
+from OpenCEP.evaluation.EvaluationMechanismFactory import TreeBasedEvaluationMechanismParameters
+from OpenCEP.tree.evaluation.TreeEvaluationMechanismUpdateTypes import TreeEvaluationMechanismUpdateTypes
+from OpenCEP.adaptive.optimizer.OptimizerFactory import StatisticsDeviationAwareOptimizerParameters, \
     InvariantsAwareOptimizerParameters, TrivialOptimizerParameters
-from plan.TreePlanBuilderFactory import TreePlanBuilderParameters, TreeCostModels, StatisticsTypes
-from plan.TreePlanBuilderTypes import TreePlanBuilderTypes
-from adaptive.statistics.StatisticsCollectorFactory import StatisticsCollectorParameters
-from tree.PatternMatchStorage import TreeStorageParameters
+from OpenCEP.plan.TreePlanBuilderFactory import TreePlanBuilderParameters, TreeCostModels, StatisticsTypes
+from OpenCEP.plan.TreePlanBuilderTypes import TreePlanBuilderTypes
+from OpenCEP.adaptive.statistics.StatisticsCollectorFactory import StatisticsCollectorParameters
+from OpenCEP.tree.PatternMatchStorage import TreeStorageParameters
 
 
 DEFAULT_TREE_STORAGE_PARAMETERS = TreeStorageParameters(sort_storage=False,

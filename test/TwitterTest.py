@@ -1,15 +1,15 @@
 import os
 
 from CEP import CEP
-from stream.FileStream import FileOutputStream
-from plugin.twitter.TwitterDataFormatter import DummyTwitterEventTypeClassifier, TweetDataFormatter
-from plugin.twitter.TwitterInputStream import TwitterInputStream
+from OpenCEP.stream.FileStream import FileOutputStream
+from OpenCEP.plugin.twitter.TwitterDataFormatter import DummyTwitterEventTypeClassifier, TweetDataFormatter
+from OpenCEP.plugin.twitter.TwitterInputStream import TwitterInputStream
 from datetime import timedelta
-from condition.Condition import Variable, SimpleCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import EqCondition, NotEqCondition
-from base.PatternStructure import SeqOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable, SimpleCondition
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import EqCondition, NotEqCondition
+from OpenCEP.base.PatternStructure import SeqOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
 
 
 def run_twitter_sanity_check():

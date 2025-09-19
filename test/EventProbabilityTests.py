@@ -1,22 +1,22 @@
 from test.testUtils import *
 from datetime import timedelta
-from condition.Condition import (
+from OpenCEP.condition.Condition import (
     Variable,
     SimpleCondition,
 )
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import (
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import (
     GreaterThanCondition,
     SmallerThanCondition,
 )
-from base.PatternStructure import (
+from OpenCEP.base.PatternStructure import (
     AndOperator,
     KleeneClosureOperator,
     NegationOperator,
     SeqOperator,
     PrimitiveEventStructure,
 )
-from base.Pattern import Pattern
+from OpenCEP.base.Pattern import Pattern
 
 nasdaqEventStreamP = FileInputStream(
     os.path.join(absolutePath, "test/EventFiles/NASDAQ_LONG_probabilities.txt")

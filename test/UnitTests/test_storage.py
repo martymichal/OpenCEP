@@ -1,7 +1,7 @@
-from base.PatternMatch import PatternMatch
-from tree.PatternMatchStorage import SortedPatternMatchStorage, UnsortedPatternMatchStorage, EquationSides
+from OpenCEP.base.PatternMatch import PatternMatch
+from OpenCEP.tree.PatternMatchStorage import SortedPatternMatchStorage, UnsortedPatternMatchStorage, EquationSides
 from datetime import datetime, timedelta
-from condition.Condition import RelopTypes
+from OpenCEP.condition.Condition import RelopTypes
 
 
 """

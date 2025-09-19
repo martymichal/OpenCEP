@@ -1,18 +1,18 @@
-from adaptive.statistics.StatisticsCollectorFactory import StatisticsCollectorParameters
-from misc.DefaultConfig import DEFAULT_TREE_COST_MODEL
-from plan.TreePlanBuilderFactory import IterativeImprovementTreePlanBuilderParameters
+from OpenCEP.adaptive.statistics.StatisticsCollectorFactory import StatisticsCollectorParameters
+from OpenCEP.misc.DefaultConfig import DEFAULT_TREE_COST_MODEL
+from OpenCEP.plan.TreePlanBuilderFactory import IterativeImprovementTreePlanBuilderParameters
 from test.EvalTestsDefaults import DEFAULT_TESTING_STATISTICS_COLLECTOR_SELECTIVITY_AND_ARRIVAL_RATES_STATISTICS
 from test.testUtils import *
-from evaluation.EvaluationMechanismFactory import TreeBasedEvaluationMechanismParameters
-from adaptive.optimizer.OptimizerFactory import StatisticsDeviationAwareOptimizerParameters
-from plan.LeftDeepTreeBuilders import *
-from plan.BushyTreeBuilders import *
+from OpenCEP.evaluation.EvaluationMechanismFactory import TreeBasedEvaluationMechanismParameters
+from OpenCEP.adaptive.optimizer.OptimizerFactory import StatisticsDeviationAwareOptimizerParameters
+from OpenCEP.plan.LeftDeepTreeBuilders import *
+from OpenCEP.plan.BushyTreeBuilders import *
 from datetime import timedelta
-from condition.Condition import Variable, TrueCondition, BinaryCondition, SimpleCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition
-from base.PatternStructure import SeqOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable, TrueCondition, BinaryCondition, SimpleCondition
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition
+from OpenCEP.base.PatternStructure import SeqOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
 
 
 def nonFrequencyPatternSearchTest(createTestFile=False):

@@ -1,11 +1,11 @@
 from test.testUtils import *
 from datetime import timedelta
-from condition.Condition import Variable, TrueCondition, BinaryCondition, SimpleCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import EqCondition, GreaterThanCondition, GreaterThanEqCondition, \
+from OpenCEP.condition.Condition import Variable, TrueCondition, BinaryCondition, SimpleCondition
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import EqCondition, GreaterThanCondition, GreaterThanEqCondition, \
     SmallerThanEqCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
+from OpenCEP.base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
 
 
 def oneArgumentsearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,

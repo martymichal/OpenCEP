@@ -1,11 +1,11 @@
 from datetime import timedelta
 
-from condition.BaseRelationCondition import GreaterThanCondition, GreaterThanEqCondition
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition, GreaterThanEqCondition
 from test.testUtils import *
-from condition.Condition import Variable
-from condition.CompositeCondition import AndCondition
-from base.PatternStructure import AndOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.base.PatternStructure import AndOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
 
 def sortedStorageTest(createTestFile=False):
     pattern = Pattern(

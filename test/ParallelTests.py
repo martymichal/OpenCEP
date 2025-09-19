@@ -1,12 +1,12 @@
 from test.testUtils import *
-from plugin.sensors.Sensors import SensorsDataFormatter
-from condition.Condition import Variable, BinaryCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import GreaterThanCondition, GreaterThanEqCondition, \
+from OpenCEP.plugin.sensors.Sensors import SensorsDataFormatter
+from OpenCEP.condition.Condition import Variable, BinaryCondition
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition, GreaterThanEqCondition, \
     SmallerThanEqCondition, SmallerThanCondition
-from base.PatternStructure import SeqOperator, PrimitiveEventStructure
-from base.Pattern import Pattern
-from parallel.ParallelExecutionParameters import *
+from OpenCEP.base.PatternStructure import SeqOperator, PrimitiveEventStructure
+from OpenCEP.base.Pattern import Pattern
+from OpenCEP.parallel.ParallelExecutionParameters import *
 from datetime import timedelta
 
 

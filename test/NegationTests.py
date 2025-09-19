@@ -1,15 +1,15 @@
-from adaptive.optimizer.OptimizerFactory import OptimizerParameters
-from adaptive.optimizer.OptimizerTypes import OptimizerTypes
-from adaptive.statistics.StatisticsTypes import StatisticsTypes
+from OpenCEP.adaptive.optimizer.OptimizerFactory import OptimizerParameters
+from OpenCEP.adaptive.optimizer.OptimizerTypes import OptimizerTypes
+from OpenCEP.adaptive.statistics.StatisticsTypes import StatisticsTypes
 from test.testUtils import *
 from datetime import timedelta
-from condition.Condition import Variable
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition
-from base.PatternStructure import SeqOperator, PrimitiveEventStructure, NegationOperator
-from base.Pattern import Pattern
+from OpenCEP.condition.Condition import Variable
+from OpenCEP.condition.CompositeCondition import AndCondition
+from OpenCEP.condition.BaseRelationCondition import GreaterThanCondition, SmallerThanCondition
+from OpenCEP.base.PatternStructure import SeqOperator, PrimitiveEventStructure, NegationOperator
+from OpenCEP.base.Pattern import Pattern
 import random
-from plan.negation.NegationAlgorithmTypes import NegationAlgorithmTypes
+from OpenCEP.plan.negation.NegationAlgorithmTypes import NegationAlgorithmTypes
 
 
 def generate_statistics(events_num: int):
