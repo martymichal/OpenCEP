@@ -74,9 +74,9 @@ class KleeneClosureNode(UnaryNode):
         actual_max_size = self.__max_size if self.__max_size is not None else len(child_partial_matches)
         generated_powerset = powerset_generator(child_partial_matches[:-1], actual_max_size - 1)
         # add the last item to all previously created subsets
-        result_powerset = [item + [last_partial_match] for item in generated_powerset]
+        result_powerset = (item + [last_partial_match] for item in generated_powerset)
         # enforce minimal size limit
-        result_powerset = [item for item in result_powerset if self.__min_size <= len(item)]
+        result_powerset = (item for item in result_powerset if self.__min_size <= len(item))
         return result_powerset
 
     def apply_condition(self, condition: CompositeCondition):
