@@ -48,8 +48,6 @@ class ConsumptionPolicy:
         """
         if primary_selection_strategy is None:
             primary_selection_strategy = DefaultConfig.PRIMARY_SELECTION_STRATEGY
-        if secondary_selection_strategy is None:
-            secondary_selection_strategy = DefaultConfig.SECONDARY_SELECTION_STRATEGY
 
         if primary_selection_strategy != SelectionStrategies.MATCH_ANY:
             if single is not None or secondary_selection_strategy is not None:
@@ -58,6 +56,9 @@ class ConsumptionPolicy:
             # to be initialized to hold all event types
             self.single_types = None
             return
+
+        if secondary_selection_strategy is None:
+            secondary_selection_strategy = DefaultConfig.SECONDARY_SELECTION_STRATEGY
 
         # primary_selection_strategy == SelectionStrategies.MATCH_ANY
         if secondary_selection_strategy == SelectionStrategies.MATCH_ANY:
