@@ -188,8 +188,8 @@ class Node(ABC):
         """
         Validates the condition stored in this node on the given set of events.
         """
-        min_timestamp = min([event.min_timestamp for event in events_for_new_match])
-        max_timestamp = max([event.max_timestamp for event in events_for_new_match])
+        min_timestamp = events_for_new_match[0].min_timestamp
+        max_timestamp = events_for_new_match[-1].max_timestamp
         return max_timestamp - min_timestamp <= self._sliding_window
 
     ###################################### Parent- and topology-related methods
