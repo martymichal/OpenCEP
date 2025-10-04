@@ -163,11 +163,14 @@ def is_sorted(arr: list, key: callable = lambda x: x, secondary_key: callable = 
     if not arr:
         return True
 
-    for i in range(len(arr) - 1):
-        if key(arr[i]) > key(arr[i + 1]):
-            return False
-        if secondary_key is not None and secondary_key(arr[i]) > secondary_key(arr[i + 1]):
-            return False
+    for i, _ in enumerate(arr):
+        try:
+            if key(arr[i]) > key(arr[i + 1]):
+                return False
+            if secondary_key is not None and secondary_key(arr[i]) > secondary_key(arr[i + 1]):
+                return False
+        except IndexError:
+            break
 
     return True
 
