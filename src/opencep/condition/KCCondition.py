@@ -33,6 +33,13 @@ class KCCondition(AtomicCondition, ABC):
         """
         return 0 <= index < len(lst)
 
+    @staticmethod
+    def _validate_index_fast(index: int, lst_size: int):
+        """
+        Validates that the given index is within the bounds of the given list.
+        """
+        return 0 <= index < lst_size
+
     def get_event_names(self):
         """
         Returns the event names associated with this condition.
@@ -102,12 +109,13 @@ class KCIndexCondition(KCCondition):
         This can be a very time-consuming process for large power-sets.
         """
         # offset too large restriction
-        if self.__offset >= len(event_list):
+        event_list_len = len(event_list)
+        if self.__offset >= event_list_len:
             return False
 
-        for i in range(len(event_list)):
+        for i in range(event_list_len):
             # test if i + offset meets index requirements ( 0 <= i <= len(event_list) - 1)
-            if not self._validate_index(i + self.__offset, event_list):
+            if not self._validate_index_fast(i + self.__offset, event_list_len):
                 continue
             # use AND logic to return True if EVERY two items that meet offset requirement return True. (early Abort)
             if not self._relation_op(self._getattr_func(event_list[i]),
