@@ -67,7 +67,7 @@ class KleeneClosureNode(UnaryNode):
         overhead.
         """
         child_partial_matches = self._child.get_partial_matches()
-        if len(child_partial_matches) == 0:
+        if not child_partial_matches:
             return []
         last_partial_match = child_partial_matches[-1]
         # create subsets for all but the last element

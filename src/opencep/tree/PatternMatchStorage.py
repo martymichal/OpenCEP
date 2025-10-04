@@ -140,7 +140,7 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         """
         Applies the storage-specific get() function to extract the required pattern matches.
         """
-        if len(self._partial_matches) == 0:
+        if not self._partial_matches:
             return []
         return self.__get_function(value)
 

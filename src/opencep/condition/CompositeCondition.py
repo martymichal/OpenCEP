@@ -20,7 +20,7 @@ class CompositeCondition(Condition, ABC):
         self._statistics_collector = None
 
     def eval(self, binding: dict = None):
-        if self.get_num_conditions() == 0:
+        if not self._conditions:
             return True
         for condition in self._conditions:
             if condition.eval(binding) == self._terminating_result:

@@ -160,7 +160,7 @@ def is_sorted(arr: list, key: callable = lambda x: x, secondary_key: callable = 
     """
     Returns True if the given list is sorted with respect to the given comparator function and False otherwise.
     """
-    if len(arr) == 0:
+    if not arr:
         return True
 
     for i in range(len(arr) - 1):
