@@ -27,7 +27,7 @@ class Event:
         Event.counter += 1
 
     def __eq__(self, other):
-        return self.payload[Event.INDEX_ATTRIBUTE_NAME] == other.payload[Event.INDEX_ATTRIBUTE_NAME]
+        return self.payload == other.payload
 
     def __hash__(self):
         return hash(self.payload[Event.INDEX_ATTRIBUTE_NAME])
