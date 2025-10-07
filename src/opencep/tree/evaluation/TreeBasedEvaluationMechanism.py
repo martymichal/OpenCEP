@@ -1,19 +1,22 @@
+import time
 from abc import ABC
+from datetime import timedelta
 from typing import Dict
+
+import opencep.misc.StudentMetrics as metrics
+from opencep.adaptive.statistics import StatisticsCollector
+from opencep.adaptive.optimizer import Optimizer
 from opencep.base.DataFormatter import DataFormatter
 from opencep.base.Event import Event
-from opencep.plan.TreePlan import TreePlan
-from opencep.stream.Stream import InputStream, OutputStream
-from opencep.misc.Utils import *
-from opencep.tree.nodes.LeafNode import LeafNode
-from opencep.tree.PatternMatchStorage import TreeStorageParameters
 from opencep.evaluation.EvaluationMechanism import EvaluationMechanism
 from opencep.misc.ConsumptionPolicy import *
+from opencep.misc.Utils import *
+from opencep.plan.TreePlan import TreePlan
+from opencep.stream.Stream import InputStream, OutputStream
+from opencep.tree.nodes.LeafNode import LeafNode
+from opencep.tree.PatternMatchStorage import TreeStorageParameters
 from opencep.tree.MultiPatternTree import MultiPatternTree
-from opencep.adaptive.statistics import StatisticsCollector
 from opencep.tree.Tree import Tree
-from datetime import timedelta
-from opencep.adaptive.optimizer import Optimizer
 
 
 class TreeBasedEvaluationMechanism(EvaluationMechanism, ABC):
@@ -61,6 +64,8 @@ class TreeBasedEvaluationMechanism(EvaluationMechanism, ABC):
         last_statistics_refresh_time = None
 
         for raw_event in events:
+            start_ns = time.perf_counter_ns()
+
             event = Event(raw_event, data_formatter)
             if event.type not in self._event_types_listeners:
                 continue
@@ -72,6 +77,15 @@ class TreeBasedEvaluationMechanism(EvaluationMechanism, ABC):
 
             self._play_new_event_on_tree(event, matches)
             self._get_matches(matches)
+
+            end_ns = time.perf_counter_ns()
+            metrics.mark_hist_point(
+                metrics.Metrics.EVENT_PROCESSING_LATENCY,
+                end_ns - start_ns,
+                {"partial_matches": len(self._tree.get_partial_matches())},
+                end_ns,
+            )
+            metrics.increment_counter(metrics.Metrics.PROCESSED_EVENTS, end_ns)
 
         # Now that we finished the input stream, if there were some pending matches somewhere in the tree, we will
         # collect them now
