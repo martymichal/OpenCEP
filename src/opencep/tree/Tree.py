@@ -63,6 +63,9 @@ class Tree:
         while self.__root.has_unreported_matches():
             yield self.__root.get_next_unreported_match()
 
+    def get_partial_matches(self):
+        return [pm for leaf in self.get_leaves() for pm in leaf.get_partial_matches()]
+
     def get_structure_summary(self):
         """
         Returns a tuple summarizing the structure of the tree.
