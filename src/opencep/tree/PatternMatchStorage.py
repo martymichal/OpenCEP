@@ -4,6 +4,10 @@ from opencep.misc.Utils import get_first_index, get_last_index
 from datetime import datetime
 from opencep.misc.Utils import find_partial_match_by_timestamp
 from opencep.condition.Condition import RelopTypes, EquationSides
+from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id, length_id
+
+# DEBUG placeholder flag: when True the storage will attempt to trigger shedding on add()
+TRIGGER_SHED_ON_ADD = True
 
 
 class PatternMatchStorage:
@@ -88,6 +92,28 @@ class PatternMatchStorage:
             self._partial_matches = list(filter(lambda pm: pm.first_timestamp >= earliest_timestamp,
                                                 self._partial_matches))
 
+        # Note: expired partials removed here are not propagated to bucket manager.
+        # We need to call remove_by_id for each removed partial id to keep bucket bookkeeping consistent.
+
+    def remove_by_id(self, partial_id):
+        """Remove a stored PatternMatch by its partial id. Returns True if removed.
+        Linear scan implementation (used for shedding). If the PatternMatch is found and
+        removed, the bucket manager is informed to keep bookkeeping consistent.
+        """
+        for i, pm in enumerate(self._partial_matches):
+            pm_id = getattr(pm, 'partial_id', None)
+            if pm_id == partial_id:
+                # remove from internal buffer
+                del self._partial_matches[i]
+                # update bucket bookkeeping if present
+                try:
+                    bucket_manager.remove_partial(partial_id)
+                except Exception:
+                    # keep best-effort: don't raise on bucket manager failures
+                    pass
+                return True
+        return False
+
     def get_internal_buffer(self):
         """
         Returns the internal buffer actually storing the pattern matches.
@@ -105,6 +131,16 @@ class PatternMatchStorage:
         Returns a list of pattern matches corresponding to the given value.
         """
         raise NotImplementedError()
+    
+    def _register_partial_in_bucket(self, pm: PatternMatch):
+        """
+        Registers the given PatternMatch in the global bucket manager if it has a stable partial_id.
+        """
+        partial_id = getattr(pm, 'partial_id', None)
+        if partial_id is not None:
+            sid = slice_id(pm.first_timestamp, pm.last_timestamp)
+            lid = length_id(len(pm.events))
+            bucket_manager.add_partial(partial_id, sid, lid)
 
 
 class SortedPatternMatchStorage(PatternMatchStorage):
@@ -128,13 +164,26 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         Efficiently inserts the new pattern match to the storage according to its key.
         """
         self._access_count += 1
-        if self._sorted_by_arrival_order:
-            # no need for artificially sorting
-            self._partial_matches.append(pm)
-            return
+
+        # Register in bucket manager
+        self._register_partial_in_bucket(pm)
+
+        # todo: implement the shedding trigger logic
+        # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
+        if TRIGGER_SHED_ON_ADD and pm.partial_id > 10:
+            try:
+                #removed = bucket_manager.shed_lowest_value_buckets(1)
+                removed = bucket_manager.shed_by_partial_count(1)
+                for rid in removed:
+                    # attempt to remove from this storage (no-op if the id belongs elsewhere)
+                    self.remove_by_id(rid)
+            except Exception:
+                pass
+
         index = get_last_index(self._partial_matches, self._get_key(pm), self._get_key)
         index = 0 if index == -1 else index
         self._partial_matches.insert(index, pm)
+        print(f"Number of sorted partial matches: {len(self._partial_matches)}")
 
     def get(self, value: int or float):
         """
@@ -263,6 +312,23 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
         """
         self._access_count += 1
         self._partial_matches.append(pm)
+        print(f"Number of unsorted partial matches: {len(self._partial_matches)}")
+
+        # Register the partial match in the global bucket manager so it can be shed later by id.
+        self._register_partial_in_bucket(pm)
+
+        #bucket_manager.debug_print_buckets()
+
+        # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
+        if TRIGGER_SHED_ON_ADD and pm.partial_id > 10:
+            try:
+                #removed = bucket_manager.shed_lowest_value_buckets(1)
+                removed = bucket_manager.shed_by_partial_count(1)
+                for rid in removed:
+                    # attempt to remove from this storage (no-op if the id belongs elsewhere)
+                    self.remove_by_id(rid)
+            except Exception:
+                pass
 
     def get(self, value: int or float):
         """

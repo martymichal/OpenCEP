@@ -8,6 +8,10 @@ class PatternMatch:
     An instance of this class could correspond either to a full pattern match, or to any intermediate result
     created during the evaluation process.
     """
+
+    # Count of all pattern matches created
+    counter = 0
+
     def __init__(self, events: List[Event], probability: float = None):
         self.events = events
         self.last_timestamp = max(events, key=lambda x: x.max_timestamp).max_timestamp
@@ -15,6 +19,9 @@ class PatternMatch:
         # this field is only used for full pattern matches
         self.pattern_ids = []
         self.probability = probability
+        # Increment global counter to gain a unique ID for this pattern match
+        PatternMatch.counter += 1
+        self.partial_id = PatternMatch.counter
 
     def __eq__(self, other):
         return isinstance(other, PatternMatch) and set(self.events) == set(other.events) and \
