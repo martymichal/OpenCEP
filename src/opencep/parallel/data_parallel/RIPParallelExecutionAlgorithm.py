@@ -38,8 +38,13 @@ class RIPParallelExecutionAlgorithm(DataParallelExecutionAlgorithm, ABC):
         Sets the algorithm's start time as the time of the first event, this start time will be referenced by
         the calling methods as a base point.
         """
-        first_event = Event(events.first(), data_formatter)
-        self._start_time = first_event.timestamp
+        if self._start_time is None:
+            event_data = next(events)
+            first_event = Event(event_data, data_formatter)
+            self._start_time = first_event.timestamp
+
+            events = itertools.chain([event_data], events)
+
         super(RIPParallelExecutionAlgorithm, self).eval(events, matches, data_formatter)
 
     def _create_skip_item(self, unit_id: int):
