@@ -27,7 +27,7 @@ def increment_counter(metric: Metrics, cur_time: int = 0):
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
     _metrics[metric] += 1
-    _log_metric(f"{cur_time} counter {str(metric)} {_metrics[metric]}")
+    _log_metric(f"{cur_time} counter {str(metric)} 1")
 
 
 def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int = 0):
