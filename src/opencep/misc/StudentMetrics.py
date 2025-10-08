@@ -1,6 +1,7 @@
 import time
 from enum import StrEnum
 from typing import Any
+from threading import Lock
 
 
 class Metrics(StrEnum):
@@ -13,18 +14,25 @@ _metrics = {
     Metrics.PROCESSED_EVENTS: 0,
 }
 
+lock = Lock()
 
-def increment_counter(metric: Metrics, cur_time: int=0):
+
+def _log_metric(msg: str):
+    lock.acquire()
+    print(msg, flush=True)
+    lock.release()
+
+
+def increment_counter(metric: Metrics, cur_time: int = 0):
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
     _metrics[metric] += 1
-    print(f"{cur_time} counter {str(metric)} {_metrics[metric]}", flush=True)
+    _log_metric(f"{cur_time} counter {str(metric)} {_metrics[metric]}")
 
 
-def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int=0):
+def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int = 0):
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
     _metrics[metric] += (value, attrs)
     attrs_str = " ".join([f"{key} {val}" for key, val in attrs.items()])
-    print(f"{cur_time} hist {str(metric)} {value} {attrs_str}", flush=True)
-
+    _log_metric(f"{cur_time} hist {str(metric)} {value} {attrs_str}")
