@@ -1,3 +1,5 @@
+import sys
+
 from opencep.base.PatternMatch import PatternMatch
 from opencep.misc import DefaultConfig
 from opencep.misc.Utils import get_first_index, get_last_index
@@ -183,7 +185,7 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         index = get_last_index(self._partial_matches, self._get_key(pm), self._get_key)
         index = 0 if index == -1 else index
         self._partial_matches.insert(index, pm)
-        print(f"Number of sorted partial matches: {len(self._partial_matches)}")
+        print(f"Number of sorted partial matches: {len(self._partial_matches)}", file=sys.stderr)
 
     def get(self, value: int or float):
         """
@@ -312,7 +314,7 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
         """
         self._access_count += 1
         self._partial_matches.append(pm)
-        print(f"Number of unsorted partial matches: {len(self._partial_matches)}")
+        print(f"Number of unsorted partial matches: {len(self._partial_matches)}", file=sys.stderr)
 
         # Register the partial match in the global bucket manager so it can be shed later by id.
         self._register_partial_in_bucket(pm)

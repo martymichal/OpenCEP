@@ -1,4 +1,5 @@
 import heapq
+import sys
 from collections import defaultdict
 from typing import Optional
 
@@ -56,26 +57,26 @@ class BucketManager:
     def debug_print_buckets(self, show_stats: bool = True):
         """Print all known buckets and their contents for debugging."""
         if not self.buckets:
-            print("BucketManager: no buckets")
+            print("BucketManager: no buckets", file=sys.stderr)
             return
-        print("BucketManager: listing buckets (bucket_id -> partial_ids)")
+        print("BucketManager: listing buckets (bucket_id -> partial_ids)", file=sys.stderr)
         for bucket_id, partial_ids in sorted(self.buckets.items()):
             stats = self.stats.get(bucket_id)
             if show_stats and stats is not None:
-                print(f"  Bucket {bucket_id}: count={len(partial_ids)}, contribution={stats.contribution:.3f}, consumption={stats.consumption:.3f}")
+                print(f"  Bucket {bucket_id}: count={len(partial_ids)}, contribution={stats.contribution:.3f}, consumption={stats.consumption:.3f}", file=sys.stderr)
             else:
-                print(f"  Bucket {bucket_id}: count={len(partial_ids)}")
+                print(f"  Bucket {bucket_id}: count={len(partial_ids)}", file=sys.stderr)
             if partial_ids:
                 # show ids in deterministic order
                 try:
                     pid_list = sorted(partial_ids)
                 except Exception:
                     pid_list = list(partial_ids)
-                print("    partial_ids:", ", ".join(str(x) for x in pid_list))
+                print("    partial_ids:", ", ".join(str(x) for x in pid_list), file=sys.stderr)
 
     def add_partial(self, partial_id, slice_id, length_id):
         bucket_id = (slice_id, length_id)
-        print(f"BucketManager.add_partial called: pid={partial_id}, bucket={bucket_id}")
+        print(f"BucketManager.add_partial called: pid={partial_id}, bucket={bucket_id}", file=sys.stderr)
         if partial_id in self.partials:
             # already registered - move if needed
             old_bucket = self.partials[partial_id]
@@ -93,7 +94,7 @@ class BucketManager:
 
     def remove_partial(self, partial_id):
         """Remove a partial by id from whichever bucket it's in. Returns True if removed."""
-        print(f"BucketManager.remove_partial called: pid={partial_id}")
+        print(f"BucketManager.remove_partial called: pid={partial_id}", file=sys.stderr)
         bucket_id = self.partials.pop(partial_id, None)
         if bucket_id is None:
             return False
