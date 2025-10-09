@@ -5,19 +5,26 @@ from typing import Optional
 
 WINDOW_SECONDS = 3600.0
 
+
 def slice_id(start_time, last_time):
     age = last_time - start_time
     ratio = age.total_seconds() / WINDOW_SECONDS
-    #print(f"slice_id: start {start_time}, last {last_time}, age {age}, ratio {ratio}")
+    # print(f"slice_id: start {start_time}, last {last_time}, age {age}, ratio {ratio}")
     # 3 equal 20‑min slices in 1 hour
-    if ratio < 1/3: return 0
-    if ratio < 2/3: return 1
+    if ratio < 1 / 3:
+        return 0
+    if ratio < 2 / 3:
+        return 1
     return 2
 
+
 def length_id(length):
-    if length <= 2: return 0
-    if length <= 5: return 1
+    if length <= 2:
+        return 0
+    if length <= 5:
+        return 1
     return 2
+
 
 """
 class ExpiryHeap:
@@ -40,10 +47,12 @@ class ExpiryHeap:
                 drop_cb(partial_id)
 """
 
+
 class BucketStats:
     def __init__(self):
         self.contribution = 0.0
         self.consumption = 0.0
+
 
 class BucketManager:
     def __init__(self):
@@ -59,24 +68,38 @@ class BucketManager:
         if not self.buckets:
             print("BucketManager: no buckets", file=sys.stderr)
             return
-        print("BucketManager: listing buckets (bucket_id -> partial_ids)", file=sys.stderr)
+        print(
+            "BucketManager: listing buckets (bucket_id -> partial_ids)", file=sys.stderr
+        )
         for bucket_id, partial_ids in sorted(self.buckets.items()):
             stats = self.stats.get(bucket_id)
             if show_stats and stats is not None:
-                print(f"  Bucket {bucket_id}: count={len(partial_ids)}, contribution={stats.contribution:.3f}, consumption={stats.consumption:.3f}", file=sys.stderr)
+                print(
+                    f"  Bucket {bucket_id}: count={len(partial_ids)}, contribution={stats.contribution:.3f}, consumption={stats.consumption:.3f}",
+                    file=sys.stderr,
+                )
             else:
-                print(f"  Bucket {bucket_id}: count={len(partial_ids)}", file=sys.stderr)
+                print(
+                    f"  Bucket {bucket_id}: count={len(partial_ids)}", file=sys.stderr
+                )
             if partial_ids:
                 # show ids in deterministic order
                 try:
                     pid_list = sorted(partial_ids)
                 except Exception:
                     pid_list = list(partial_ids)
-                print("    partial_ids:", ", ".join(str(x) for x in pid_list), file=sys.stderr)
+                print(
+                    "    partial_ids:",
+                    ", ".join(str(x) for x in pid_list),
+                    file=sys.stderr,
+                )
 
     def add_partial(self, partial_id, slice_id, length_id):
         bucket_id = (slice_id, length_id)
-        print(f"BucketManager.add_partial called: pid={partial_id}, bucket={bucket_id}", file=sys.stderr)
+        print(
+            f"BucketManager.add_partial called: pid={partial_id}, bucket={bucket_id}",
+            file=sys.stderr,
+        )
         if partial_id in self.partials:
             # already registered - move if needed
             old_bucket = self.partials[partial_id]
@@ -109,9 +132,12 @@ class BucketManager:
         """Return list of (bucket_id, BucketStats) sorted by bucket value (contribution/consumption).
         If consumption==0 the value is considered 0. By default returns descending (highest first).
         """
+
         def value(item):
             stats = item[1]
-            return (stats.contribution / stats.consumption) if stats.consumption else 0.0
+            return (
+                (stats.contribution / stats.consumption) if stats.consumption else 0.0
+            )
 
         return sorted(self.stats.items(), key=value, reverse=reverse)
 
