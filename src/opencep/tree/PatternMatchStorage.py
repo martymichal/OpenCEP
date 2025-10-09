@@ -176,8 +176,7 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
         if TRIGGER_SHED_ON_ADD and last_values[Metrics.EVENT_PROCESSING_LATENCY] > LATENCY_THRESHOLD:
             try:
-                #removed = bucket_manager.shed_lowest_value_buckets(1)
-                removed = bucket_manager.shed_by_partial_count(1)
+                removed = bucket_manager.shed_lowest_value_buckets(1)
                 for rid in removed:
                     # attempt to remove from this storage (no-op if the id belongs elsewhere)
                     self.remove_by_id(rid)
@@ -331,8 +330,7 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
         # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
         if TRIGGER_SHED_ON_ADD and last_values[Metrics.EVENT_PROCESSING_LATENCY] > LATENCY_THRESHOLD:
             try:
-                #removed = bucket_manager.shed_lowest_value_buckets(1)
-                removed = bucket_manager.shed_by_partial_count(1)
+                removed = bucket_manager.shed_lowest_value_buckets(1)
                 for rid in removed:
                     # attempt to remove from this storage (no-op if the id belongs elsewhere)
                     self.remove_by_id(rid)
