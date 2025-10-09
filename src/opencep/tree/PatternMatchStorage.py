@@ -7,9 +7,11 @@ from datetime import datetime
 from opencep.misc.Utils import find_partial_match_by_timestamp
 from opencep.condition.Condition import RelopTypes, EquationSides
 from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id, length_id
+from opencep.misc.StudentMetrics import Metrics, last_values
 
 # DEBUG placeholder flag: when True the storage will attempt to trigger shedding on add()
 TRIGGER_SHED_ON_ADD = True
+LATENCY_THRESHOLD = 1_000_000_000 # 1s in ns
 
 
 class PatternMatchStorage:
@@ -172,7 +174,7 @@ class SortedPatternMatchStorage(PatternMatchStorage):
 
         # todo: implement the shedding trigger logic
         # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
-        if TRIGGER_SHED_ON_ADD and pm.partial_id > 10:
+        if TRIGGER_SHED_ON_ADD and last_values[Metrics.EVENT_PROCESSING_LATENCY] > LATENCY_THRESHOLD:
             try:
                 #removed = bucket_manager.shed_lowest_value_buckets(1)
                 removed = bucket_manager.shed_by_partial_count(1)
@@ -327,7 +329,7 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
         #bucket_manager.debug_print_buckets()
 
         # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
-        if TRIGGER_SHED_ON_ADD and pm.partial_id > 10:
+        if TRIGGER_SHED_ON_ADD and last_values[Metrics.EVENT_PROCESSING_LATENCY] > LATENCY_THRESHOLD:
             try:
                 #removed = bucket_manager.shed_lowest_value_buckets(1)
                 removed = bucket_manager.shed_by_partial_count(1)
