@@ -3,26 +3,22 @@ import sys
 from collections import defaultdict
 
 WINDOW_SECONDS = 3600.0
+NUM_OF_TIME_SLICES = 3
+MAX_PM_LEN = 4
 
 
 def slice_id(start_time: datetime.datetime, last_time: datetime.datetime):
     age = last_time - start_time
     ratio = age.total_seconds() / WINDOW_SECONDS
-    # print(f"slice_id: start {start_time}, last {last_time}, age {age}, ratio {ratio}")
-    # 3 equal 20‑min slices in 1 hour
-    if ratio < 1 / 3:
-        return 0
-    if ratio < 2 / 3:
-        return 1
-    return 2
+    for i in range(1, NUM_OF_TIME_SLICES - 1):
+        if ratio < i / NUM_OF_TIME_SLICES:
+            return i - 1
+    return NUM_OF_TIME_SLICES - 1
 
 
 def length_id(length):
-    if length <= 2:
-        return 0
-    if length <= 5:
-        return 1
-    return 2
+    id = int(length / NUM_OF_TIME_SLICES * MAX_PM_LEN)
+    return id
 
 
 """
