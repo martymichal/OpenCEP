@@ -182,6 +182,11 @@ class SortedPatternMatchStorage(PatternMatchStorage):
             except Exception:
                 pass
 
+        if self._sorted_by_arrival_order:
+            # no need for artificially sorting
+            self._partial_matches.append(pm)
+            return
+
         index = get_last_index(self._partial_matches, self._get_key(pm), self._get_key)
         index = 0 if index == -1 else index
         self._partial_matches.insert(index, pm)
