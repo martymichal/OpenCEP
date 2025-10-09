@@ -1,4 +1,4 @@
-from opencep.base.Event import Event
+from opencep.base.Event import Event, AggregatedEvent
 from typing import List
 
 
@@ -31,7 +31,11 @@ class PatternMatch:
         result = ""
         match = ""
         for event in self.events:
-            match += "%s\n" % event
+            if isinstance(event, AggregatedEvent):
+                for primitive_event in event.primitive_events:
+                    match += f"{primitive_event}\n"
+            else:
+                match += "%s\n" % event
         if len(self.pattern_ids) == 0:
             result += match
             result += "\n"
@@ -41,6 +45,15 @@ class PatternMatch:
                 result += match
                 result += "\n"
         return result
+
+    def __len__(self):
+        res = 0
+        for event in self.events:
+            if isinstance(event, AggregatedEvent):
+                res += len(event.primitive_events)
+            else:
+                res += 1
+        return res
 
     def add_pattern_id(self, pattern_id: int):
         """

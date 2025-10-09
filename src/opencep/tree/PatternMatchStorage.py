@@ -141,7 +141,7 @@ class PatternMatchStorage:
         partial_id = getattr(pm, 'partial_id', None)
         if partial_id is not None:
             sid = slice_id(pm.first_timestamp, pm.last_timestamp)
-            lid = length_id(len(pm.events))
+            lid = length_id(len(pm))
             bucket_manager.add_partial(partial_id, sid, lid)
 
 
