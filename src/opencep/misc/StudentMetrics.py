@@ -9,6 +9,9 @@ class Metrics(StrEnum):
     PROCESSED_EVENTS = "processed_events"
 
 
+last_values = {
+    Metrics.EVENT_PROCESSING_LATENCY: 0,
+}
 lock = Lock()
 
 
@@ -29,3 +32,4 @@ def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
     attrs_str = " ".join([f"{key} {val}" for key, val in attrs.items()])
     _log_metric(f"{cur_time} hist {str(metric)} {value} {attrs_str}")
+    last_values[metric] = value
