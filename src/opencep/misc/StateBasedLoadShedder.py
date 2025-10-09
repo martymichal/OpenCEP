@@ -21,28 +21,6 @@ def length_id(length):
     return id
 
 
-"""
-class ExpiryHeap:
-    def __init__(self):
-        self.heap = []      # (expire_at, partial_id)
-        self.alive = set()
-
-    def add(self, partial_id, expire_at):
-        heapq.heappush(self.heap, (expire_at, partial_id))
-        self.alive.add(partial_id)
-
-    def mark_dead(self, partial_id):
-        self.alive.discard(partial_id)
-
-    def evict(self, now_ts, drop_cb):
-        while self.heap and self.heap[0][0] <= now_ts:
-            _, partial_id = heapq.heappop(self.heap)
-            if partial_id in self.alive:
-                self.alive.remove(partial_id)
-                drop_cb(partial_id)
-"""
-
-
 class BucketStats:
     def __init__(self):
         self.contribution = 0.0
