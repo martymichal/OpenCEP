@@ -43,7 +43,10 @@ class KleeneClosureNode(UnaryNode):
             probability = None if self._confidence is None else \
                 reduce(calculate_joint_probability, (pm.probability for pm in partial_match_set), None)
             aggregated_event = AggregatedEvent(all_primitive_events, probability)
-            self._validate_and_propagate_partial_match([aggregated_event], probability)
+            if not self._validate_new_match([aggregated_event]):
+                continue
+            self._propagate_partial_match(aggregated_event.primitive_events, probability)
+
 
     def _validate_new_match(self, events_for_new_match: List[Event]):
         """
