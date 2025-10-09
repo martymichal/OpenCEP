@@ -6,7 +6,7 @@ from opencep.misc.Utils import get_first_index, get_last_index
 from datetime import datetime
 from opencep.misc.Utils import find_partial_match_by_timestamp
 from opencep.condition.Condition import RelopTypes, EquationSides
-from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id, length_id
+from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id
 from opencep.misc.StudentMetrics import Metrics, last_values
 
 # DEBUG placeholder flag: when True the storage will attempt to trigger shedding on add()
@@ -143,7 +143,7 @@ class PatternMatchStorage:
         partial_id = getattr(pm, 'partial_id', None)
         if partial_id is not None:
             sid = slice_id(pm.first_timestamp, pm.last_timestamp)
-            lid = length_id(len(pm))
+            lid = len(pm)
             bucket_manager.add_partial(partial_id, sid, lid)
 
 

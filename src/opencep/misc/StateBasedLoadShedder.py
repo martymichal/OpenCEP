@@ -4,7 +4,6 @@ from collections import defaultdict
 
 WINDOW_SECONDS = 3600.0
 NUM_OF_TIME_SLICES = 3
-MAX_PM_LEN = 4
 
 
 def slice_id(start_time: datetime.datetime, last_time: datetime.datetime):
@@ -14,11 +13,6 @@ def slice_id(start_time: datetime.datetime, last_time: datetime.datetime):
         if ratio < i / NUM_OF_TIME_SLICES:
             return i - 1
     return NUM_OF_TIME_SLICES - 1
-
-
-def length_id(length):
-    id = int(length / NUM_OF_TIME_SLICES * MAX_PM_LEN)
-    return id
 
 
 class BucketStats:
