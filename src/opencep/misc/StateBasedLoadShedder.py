@@ -1,12 +1,11 @@
-import heapq
+import datetime
 import sys
 from collections import defaultdict
-from typing import Optional
 
 WINDOW_SECONDS = 3600.0
 
 
-def slice_id(start_time, last_time):
+def slice_id(start_time: datetime.datetime, last_time: datetime.datetime):
     age = last_time - start_time
     ratio = age.total_seconds() / WINDOW_SECONDS
     # print(f"slice_id: start {start_time}, last {last_time}, age {age}, ratio {ratio}")
