@@ -183,22 +183,20 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         """
         self._access_count += 1
 
-        # Register in bucket manager
-        self._register_partial_in_bucket(pm)
+        if self._use_load_shedding:
+            self._register_partial_in_bucket(pm)
 
-        if (
-            self._use_load_shedding
-            and self._latency_threshold_ns != -1
-            and last_values[Metrics.EVENT_PROCESSING_LATENCY]
-            > self._latency_threshold_ns
-        ):
-            try:
-                removed = bucket_manager.shed_lowest_value_buckets(1)
-                for rid in removed:
-                    # attempt to remove from this storage (no-op if the id belongs elsewhere)
-                    self.remove_by_id(rid)
-            except Exception:
-                pass
+            if (
+                self._latency_threshold_ns != -1
+                and last_values[Metrics.EVENT_PROCESSING_LATENCY]
+                > self._latency_threshold_ns
+            ):
+                try:
+                    removed = bucket_manager.shed_lowest_value_buckets(1)
+                    for rid in removed:
+                        self.remove_by_id(rid)
+                except Exception:
+                    pass
 
         if self._sorted_by_arrival_order:
             # no need for artificially sorting
@@ -347,24 +345,20 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
         self._partial_matches.append(pm)
         print(f"Number of unsorted partial matches: {len(self._partial_matches)}", file=sys.stderr)
 
-        # Register the partial match in the global bucket manager so it can be shed later by id.
-        self._register_partial_in_bucket(pm)
+        if self._use_load_shedding:
+            self._register_partial_in_bucket(pm)
 
-        #bucket_manager.debug_print_buckets()
-
-        if (
-            self._use_load_shedding
-            and self._latency_threshold_ns != -1
-            and last_values[Metrics.EVENT_PROCESSING_LATENCY]
-            > self._latency_threshold_ns
-        ):
-            try:
-                removed = bucket_manager.shed_lowest_value_buckets(1)
-                for rid in removed:
-                    # attempt to remove from this storage (no-op if the id belongs elsewhere)
-                    self.remove_by_id(rid)
-            except Exception:
-                pass
+            if (
+                self._latency_threshold_ns != -1
+                and last_values[Metrics.EVENT_PROCESSING_LATENCY]
+                > self._latency_threshold_ns
+            ):
+                try:
+                    removed = bucket_manager.shed_lowest_value_buckets(1)
+                    for rid in removed:
+                        self.remove_by_id(rid)
+                except Exception:
+                    pass
 
     def get(self, value: int or float):
         """
