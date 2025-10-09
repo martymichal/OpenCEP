@@ -53,10 +53,21 @@ class InternalNode(Node, ABC):
         In the internal nodes, we only sort the storage if a storage key is explicitly provided by the user.
         """
         if not storage_params.sort_storage or sorting_key is None:
-            self._partial_matches = UnsortedPatternMatchStorage(storage_params.clean_up_interval)
+            self._partial_matches = UnsortedPatternMatchStorage(
+                storage_params.clean_up_interval,
+                use_load_shedding=storage_params.use_load_shedding,
+                latency_threshold_ns=storage_params.latency_threshold_ns,
+            )
         else:
-            self._partial_matches = SortedPatternMatchStorage(sorting_key, rel_op, equation_side,
-                                                              storage_params.clean_up_interval, sort_by_first_timestamp)
+            self._partial_matches = SortedPatternMatchStorage(
+                sorting_key,
+                rel_op,
+                equation_side,
+                storage_params.clean_up_interval,
+                storage_params.use_load_shedding,
+                storage_params.latency_threshold_ns,
+                sort_by_first_timestamp,
+            )
 
     def handle_new_partial_match(self, partial_match_source: Node):
         """

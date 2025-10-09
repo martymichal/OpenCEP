@@ -9,10 +9,6 @@ from opencep.condition.Condition import RelopTypes, EquationSides
 from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id
 from opencep.misc.StudentMetrics import Metrics, last_values
 
-# DEBUG placeholder flag: when True the storage will attempt to trigger shedding on add()
-TRIGGER_SHED_ON_ADD = True
-LATENCY_THRESHOLD = 1_000_000_000 # 1s in ns
-
 
 class PatternMatchStorage:
     """
@@ -22,7 +18,8 @@ class PatternMatchStorage:
     containing a single object, multiple objects, or even the entire stored content). This behavior contradicts the
     "regular" container behavior fetching a single value corresponding to this key.
     """
-    def __init__(self, get_match_key: callable, sorted_by_arrival_order: bool, clean_up_interval: int):
+    def __init__(self, get_match_key: callable, sorted_by_arrival_order: bool, clean_up_interval: int,
+                 use_load_shedding: bool, latency_threshold_ns: int):
         self._partial_matches = []
         if get_match_key is None:
             self._get_key = lambda x: x
@@ -30,6 +27,8 @@ class PatternMatchStorage:
             self._get_key = get_match_key
         self._sorted_by_arrival_order = sorted_by_arrival_order
         self._clean_up_interval = clean_up_interval
+        self._use_load_shedding = use_load_shedding
+        self._latency_threshold_ns = latency_threshold_ns
         self._access_count = 0
 
     def get_key_function(self):
@@ -151,9 +150,24 @@ class SortedPatternMatchStorage(PatternMatchStorage):
     """
     This class stores the pattern matches sorted in increasing order according to a predefined function (key).
     """
-    def __init__(self, get_match_key: callable, rel_op: RelopTypes, equation_side: EquationSides,
-                 clean_up_interval: int, sort_by_first_timestamp=False, in_leaf=False):
-        super().__init__(get_match_key, in_leaf and sort_by_first_timestamp, clean_up_interval)
+    def __init__(
+        self,
+        get_match_key: callable,
+        rel_op: RelopTypes,
+        equation_side: EquationSides,
+        clean_up_interval: int,
+        use_load_shedding: bool,
+        latency_threshold_ns: int,
+        sort_by_first_timestamp=False,
+        in_leaf=False,
+    ):
+        super().__init__(
+            get_match_key,
+            in_leaf and sort_by_first_timestamp,
+            clean_up_interval,
+            use_load_shedding,
+            latency_threshold_ns,
+        )
         self.__get_function = self.__generate_get_function(rel_op, equation_side)
 
     def __contains__(self, item):
@@ -172,9 +186,12 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         # Register in bucket manager
         self._register_partial_in_bucket(pm)
 
-        # todo: implement the shedding trigger logic
-        # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
-        if TRIGGER_SHED_ON_ADD and last_values[Metrics.EVENT_PROCESSING_LATENCY] > LATENCY_THRESHOLD:
+        if (
+            self._use_load_shedding
+            and self._latency_threshold_ns != -1
+            and last_values[Metrics.EVENT_PROCESSING_LATENCY]
+            > self._latency_threshold_ns
+        ):
             try:
                 removed = bucket_manager.shed_lowest_value_buckets(1)
                 for rid in removed:
@@ -311,8 +328,16 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
     This class stores pattern matches unsorted.
     It is used when it's difficult to specify an order that helps when receiving partial matches.
     """
-    def __init__(self, clean_up_interval: int):
-        super().__init__(lambda x: x, False, clean_up_interval)
+    def __init__(
+        self, clean_up_interval: int, use_load_shedding: bool, latency_threshold_ns: int
+    ):
+        super().__init__(
+            lambda x: x,
+            False,
+            clean_up_interval,
+            use_load_shedding,
+            latency_threshold_ns,
+        )
 
     def add(self, pm: PatternMatch):
         """
@@ -327,8 +352,12 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
 
         #bucket_manager.debug_print_buckets()
 
-        # now filters based on flag and after 10 partials are registered (otherwise it always stayed at 1)
-        if TRIGGER_SHED_ON_ADD and last_values[Metrics.EVENT_PROCESSING_LATENCY] > LATENCY_THRESHOLD:
+        if (
+            self._use_load_shedding
+            and self._latency_threshold_ns != -1
+            and last_values[Metrics.EVENT_PROCESSING_LATENCY]
+            > self._latency_threshold_ns
+        ):
             try:
                 removed = bucket_manager.shed_lowest_value_buckets(1)
                 for rid in removed:
@@ -348,9 +377,15 @@ class TreeStorageParameters:
     """
     Parameters for the evaluation tree to specify how to store the data.
     """
-    def __init__(self, sort_storage: bool = DefaultConfig.SHOULD_SORT_STORAGE, attributes_priorities: dict = None,
-                 clean_up_interval: int = DefaultConfig.CLEANUP_INTERVAL,
-                 prioritize_sorting_by_timestamp: bool = DefaultConfig.PRIORITIZE_SORTING_BY_TIMESTAMP):
+    def __init__(
+        self,
+        sort_storage: bool = DefaultConfig.SHOULD_SORT_STORAGE,
+        attributes_priorities: dict = None,
+        clean_up_interval: int = DefaultConfig.CLEANUP_INTERVAL,
+        prioritize_sorting_by_timestamp: bool = DefaultConfig.PRIORITIZE_SORTING_BY_TIMESTAMP,
+        use_load_shedding: bool = DefaultConfig.USE_LOAD_SHEDDING,
+        latency_threshold_ns: int = DefaultConfig.LATENCY_THRESHOLD_NS,
+    ):
         if sort_storage is None:
             sort_storage = DefaultConfig.SHOULD_SORT_STORAGE
         if attributes_priorities is None:
@@ -369,3 +404,7 @@ class TreeStorageParameters:
         # The number of partial match additions after which a cleanup operation will be applied
         self.clean_up_interval = clean_up_interval
         self.prioritize_sorting_by_timestamp = prioritize_sorting_by_timestamp
+
+        # State-based load shedding
+        self.use_load_shedding = use_load_shedding
+        self.latency_threshold_ns = latency_threshold_ns

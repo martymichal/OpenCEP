@@ -86,4 +86,6 @@ SIMULATED_ANNEALING_C_THRESHOLD = 0.001  # final threshold to end simulated anne
 TABU_SEARCH_CAPACITY = 10000  # the capacity of the tabu list
 TABU_SEARCH_NEIGHBORHOOD_SIZE = 100  # how many neighbors to search in each step
 
-
+# Load shedding settings
+USE_LOAD_SHEDDING = False
+LATENCY_THRESHOLD_NS = -1

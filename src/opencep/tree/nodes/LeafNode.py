@@ -93,9 +93,16 @@ class LeafNode(Node):
         should_use_default_storage_mode = not storage_params.sort_storage or sorting_key is None
         actual_sorting_key = (lambda pm: pm.events[0].timestamp) if should_use_default_storage_mode else sorting_key
         actual_sort_by_first_timestamp = should_use_default_storage_mode or sort_by_first_timestamp
-        self._partial_matches = SortedPatternMatchStorage(actual_sorting_key, rel_op, equation_side,
-                                                          storage_params.clean_up_interval,
-                                                          actual_sort_by_first_timestamp, True)
+        self._partial_matches = SortedPatternMatchStorage(
+            actual_sorting_key,
+            rel_op,
+            equation_side,
+            storage_params.clean_up_interval,
+            storage_params.use_load_shedding,
+            storage_params.latency_threshold_ns,
+            actual_sort_by_first_timestamp,
+            True,
+        )
 
     def get_structure_summary(self):
         return self.__event_name
