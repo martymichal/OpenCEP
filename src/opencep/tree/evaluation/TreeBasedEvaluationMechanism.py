@@ -139,8 +139,11 @@ class TreeBasedEvaluationMechanism(EvaluationMechanism, ABC):
         """
         Collects the ready matches from the tree and adds them to the evaluation matches.
         """
+        time_ns = time.perf_counter_ns()
+
         for match in self._tree.get_matches():
             matches.add_item(match)
+            metrics.increment_counter(metrics.Metrics.DETECTED_MATCHES, time_ns)
             self._remove_matched_freezers(match.events)
 
     @staticmethod

@@ -7,6 +7,7 @@ from threading import Lock
 class Metrics(StrEnum):
     EVENT_PROCESSING_LATENCY = "event_processing_latency"
     PROCESSED_EVENTS = "processed_events"
+    DETECTED_MATCHES = "detected_matches"
 
 
 class Fields(StrEnum):
