@@ -14,11 +14,19 @@ def slice_id(start_time: datetime.datetime, last_time: datetime.datetime):
             return i - 1
     return NUM_OF_TIME_SLICES - 1
 
+def length_id(length: int):  # inverts the length value to favor longer matches
+    if length <= 1:
+        return 2
+    elif length <= 2:
+        return 1
+    else:
+        return 0
 
 class BucketStats:
     def __init__(self):
         self.contribution = 0.0
         self.consumption = 0.0
+        self.active_partials = 0  # number of partials currently in this bucket
 
 
 class BucketManager:
@@ -42,12 +50,12 @@ class BucketManager:
             stats = self.stats.get(bucket_id)
             if show_stats and stats is not None:
                 print(
-                    f"  Bucket {bucket_id}: count={len(partial_ids)}, contribution={stats.contribution:.3f}, consumption={stats.consumption:.3f}",
+                    f"  Bucket {bucket_id}: count={stats.active_partials}",
                     file=sys.stderr,
                 )
             else:
                 print(
-                    f"  Bucket {bucket_id}: count={len(partial_ids)}", file=sys.stderr
+                    f"  Bucket {bucket_id}: count(partial_ids)={len(partial_ids)}", file=sys.stderr
                 )
             if partial_ids:
                 # show ids in deterministic order
@@ -63,10 +71,10 @@ class BucketManager:
 
     def add_partial(self, partial_id, slice_id, length_id):
         bucket_id = (slice_id, length_id)
-        print(
+        """print(
             f"BucketManager.add_partial called: pid={partial_id}, bucket={bucket_id}",
             file=sys.stderr,
-        )
+        )"""
         if partial_id in self.partials:
             # already registered - move if needed
             old_bucket = self.partials[partial_id]
@@ -74,17 +82,19 @@ class BucketManager:
                 return
             # remove from old
             self.buckets[old_bucket].discard(partial_id)
-            self.stats[old_bucket].consumption += -1.0
+            self.stats[old_bucket].consumption -= 1.0
+            self.stats[old_bucket].active_partials -= 1
 
         self.buckets[bucket_id].add(partial_id)
         self.partials[partial_id] = bucket_id
         bucket = self.stats[bucket_id]
         bucket.consumption += 1.0  # simple cost increment
-        self.debug_print_buckets(show_stats=True)
+        bucket.active_partials += 1  # increment active partials
+        #self.debug_print_buckets(show_stats=True)
 
     def remove_partial(self, partial_id):
         """Remove a partial by id from whichever bucket it's in. Returns True if removed."""
-        print(f"BucketManager.remove_partial called: pid={partial_id}", file=sys.stderr)
+        #print(f"BucketManager.remove_partial called: pid={partial_id}", file=sys.stderr)
         bucket_id = self.partials.pop(partial_id, None)
         if bucket_id is None:
             return False
@@ -93,6 +103,8 @@ class BucketManager:
         # update stats safely
         stats = self.stats[bucket_id]
         stats.consumption -= 1.0
+        stats.active_partials -= 1
+
         return True
 
     def buckets_sorted_by_value(self, reverse=True):
@@ -101,14 +113,16 @@ class BucketManager:
         """
 
         def value(item):
-            stats = item[1]
-            return (
-                (stats.contribution / stats.consumption) if stats.consumption else 0.0
-            )
+            bucket_id = item[0]
+            try:
+                slice_idx, length_idx = bucket_id
+                return float(slice_idx + length_idx)
+            except Exception:
+                return 0.0
 
         return sorted(self.stats.items(), key=value, reverse=reverse)
 
-    def shed_lowest_value_buckets(self, n=1, min_partials_removed=0):
+    #def shed_lowest_value_buckets(self, n=1, min_partials_removed=0):
         """Shed the n buckets with the lowest value (contribution/consumption).
         If min_partials_removed>0, continue shedding buckets (starting from lowest value)
         until at least that many partial ids have been freed (or until no buckets left).
@@ -116,6 +130,40 @@ class BucketManager:
         """
         # sort ascending (lowest value first)
         sorted_buckets = self.buckets_sorted_by_value(reverse=False)
+        removed = []
+        count = 0
+        for bucket_id, _ in sorted_buckets:
+            if n <= 0 and min_partials_removed <= 0:
+                break
+            # skip empty buckets
+            partial_ids = list(self.buckets.get(bucket_id, ()))
+            if not partial_ids:
+                # remove empty stats to keep structures tidy
+                self.stats.pop(bucket_id, None)
+                self.buckets.pop(bucket_id, None)
+                continue
+            # remove this bucket entirely
+            for partial_id in partial_ids:
+                # remove mapping
+                self.partials.pop(partial_id, None)
+            removed.extend(partial_ids)
+            count += len(partial_ids)
+            # clear bucket and stats
+            self.buckets.pop(bucket_id, None)
+            self.stats.pop(bucket_id, None)
+            n -= 1
+            if min_partials_removed and count >= min_partials_removed:
+                break
+        return removed
+    
+    def shed_highest_value_buckets(self, n=1, min_partials_removed=0):
+        """Shed the n buckets with the highest value.
+        If min_partials_removed>0, continue shedding buckets (starting from highest value)
+        until at least that many partial ids have been freed (or until no buckets left).
+        Returns the list of removed partial_ids.
+        """
+        # sort descending (highest value first)
+        sorted_buckets = self.buckets_sorted_by_value(reverse=True)
         removed = []
         count = 0
         for bucket_id, _ in sorted_buckets:

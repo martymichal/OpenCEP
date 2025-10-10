@@ -6,9 +6,10 @@ from opencep.misc.Utils import get_first_index, get_last_index
 from datetime import datetime
 from opencep.misc.Utils import find_partial_match_by_timestamp
 from opencep.condition.Condition import RelopTypes, EquationSides
-from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id
+from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id, length_id
 from opencep.misc.StudentMetrics import Metrics, last_values
 
+shedder_cooldown = 5  # events between shedding attempts
 
 class PatternMatchStorage:
     """
@@ -142,7 +143,7 @@ class PatternMatchStorage:
         partial_id = getattr(pm, 'partial_id', None)
         if partial_id is not None:
             sid = slice_id(pm.first_timestamp, pm.last_timestamp)
-            lid = len(pm)
+            lid = length_id(len(pm))
             bucket_manager.add_partial(partial_id, sid, lid)
 
 
@@ -192,7 +193,7 @@ class SortedPatternMatchStorage(PatternMatchStorage):
                 > self._latency_threshold_ns
             ):
                 try:
-                    removed = bucket_manager.shed_lowest_value_buckets(1)
+                    removed = bucket_manager.shed_highest_value_buckets(1)
                     for rid in removed:
                         self.remove_by_id(rid)
                 except Exception:
@@ -352,11 +353,13 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
                 self._latency_threshold_ns != -1
                 and last_values[Metrics.EVENT_PROCESSING_LATENCY]
                 > self._latency_threshold_ns
+                and shedder_cooldown == 0
             ):
                 try:
-                    removed = bucket_manager.shed_lowest_value_buckets(1)
+                    removed = bucket_manager.shed_highest_value_buckets(1)
                     for rid in removed:
                         self.remove_by_id(rid)
+                    shedder_cooldown = 5
                 except Exception:
                     pass
 
