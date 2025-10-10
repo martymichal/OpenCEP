@@ -27,7 +27,7 @@ lock = Lock()
 def _log_metric(values: list[str]):
     assert len(values) == len(Fields)
     lock.acquire()
-    print(" ".join(values), flush=True)
+    print(" ".join([str(v) for v in values]), flush=True)
     lock.release()
 
 
@@ -41,6 +41,6 @@ def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
     _log_metric(
-        [cur_time, "hist", str(metric), value, attrs.keys()[0], attrs.values()[0]]
+        [cur_time, "hist", str(metric), int(value), list(attrs.keys())[0], list(attrs.values())[0]]
     )
     last_values[metric] = value
