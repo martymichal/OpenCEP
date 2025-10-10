@@ -9,27 +9,38 @@ class Metrics(StrEnum):
     PROCESSED_EVENTS = "processed_events"
 
 
+class Fields(StrEnum):
+    TIME = "time"
+    TYPE = "type"
+    METRIC = "metric"
+    VALUE = "value"
+    ATTRIBUTE = "attribute"
+    ATTRIBUTE_VALUE = "attribute_value"
+
+
 last_values = {
     Metrics.EVENT_PROCESSING_LATENCY: 0,
 }
 lock = Lock()
 
 
-def _log_metric(msg: str):
+def _log_metric(values: list[str]):
+    assert len(values) == len(Fields)
     lock.acquire()
-    print(msg, flush=True)
+    print(" ".join(values), flush=True)
     lock.release()
 
 
 def increment_counter(metric: Metrics, cur_time: int = 0):
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
-    _log_metric(f"{cur_time} counter {str(metric)} 1")
+    _log_metric([cur_time, "counter", str(metric), 1, 0, 0])
 
 
 def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int = 0):
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
-    attrs_str = " ".join([f"{key} {val}" for key, val in attrs.items()])
-    _log_metric(f"{cur_time} hist {str(metric)} {value} {attrs_str}")
+    _log_metric(
+        [cur_time, "hist", str(metric), value, attrs.keys()[0], attrs.values()[0]]
+    )
     last_values[metric] = value
