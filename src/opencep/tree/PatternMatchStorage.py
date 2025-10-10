@@ -7,9 +7,10 @@ from datetime import datetime
 from opencep.misc.Utils import find_partial_match_by_timestamp
 from opencep.condition.Condition import RelopTypes, EquationSides
 from opencep.misc.StateBasedLoadShedder import bucket_manager, slice_id, length_id
-from opencep.misc.StudentMetrics import Metrics, last_values
+from opencep.misc.StudentMetrics import Metrics, last_values, test_last_values
 
-shedder_cooldown = 5  # events between shedding attempts
+SHEDDER_COOLDOWN = 3  # minimum number of events between shedding attempts
+latest_number_of_events = 0  # counter of events at the time of last shedding attempt
 
 class PatternMatchStorage:
     """
@@ -187,15 +188,21 @@ class SortedPatternMatchStorage(PatternMatchStorage):
         if self._use_load_shedding:
             self._register_partial_in_bucket(pm)
 
+            global latest_number_of_events
+            #print(f"processed events: {test_last_values.get(Metrics.PROCESSED_EVENTS, 0)}, latest at shedding: {latest_number_of_events}, difference: {test_last_values.get(Metrics.PROCESSED_EVENTS, 0) - latest_number_of_events}", file=sys.stderr)
             if (
                 self._latency_threshold_ns != -1
                 and last_values[Metrics.EVENT_PROCESSING_LATENCY]
                 > self._latency_threshold_ns
+                and test_last_values.get(Metrics.PROCESSED_EVENTS, 0) - latest_number_of_events >= SHEDDER_COOLDOWN  # only shed if cooldown elapsed
             ):
+                #print("attempting to shed load", file=sys.stderr)
                 try:
-                    removed = bucket_manager.shed_highest_value_buckets(1)
+                    removed = bucket_manager.shed_highest_value_buckets(1)  # where highest value means most expensive, unituivitely.
                     for rid in removed:
                         self.remove_by_id(rid)
+                    latest_number_of_events = test_last_values.get(Metrics.PROCESSED_EVENTS, 0)
+                    print("Shedding successful", file=sys.stderr)
                 except Exception:
                     pass
 
@@ -343,23 +350,25 @@ class UnsortedPatternMatchStorage(PatternMatchStorage):
         Appends the given pattern match to the match buffer.
         """
         self._access_count += 1
-        self._partial_matches.append(pm)
-        print(f"Number of unsorted partial matches: {len(self._partial_matches)}", file=sys.stderr)
 
         if self._use_load_shedding:
             self._register_partial_in_bucket(pm)
 
+            global latest_number_of_events
+            #print(f"processed events: {test_last_values.get(Metrics.PROCESSED_EVENTS, 0)}, latest at shedding: {latest_number_of_events}, difference: {test_last_values.get(Metrics.PROCESSED_EVENTS, 0) - latest_number_of_events}", file=sys.stderr)
             if (
                 self._latency_threshold_ns != -1
                 and last_values[Metrics.EVENT_PROCESSING_LATENCY]
                 > self._latency_threshold_ns
-                and shedder_cooldown == 0
+                and test_last_values.get(Metrics.PROCESSED_EVENTS, 0) - latest_number_of_events >= SHEDDER_COOLDOWN  # only shed if cooldown elapsed
             ):
+                #print("attempting to shed load", file=sys.stderr)
                 try:
-                    removed = bucket_manager.shed_highest_value_buckets(1)
+                    removed = bucket_manager.shed_highest_value_buckets(1)  # where highest value means most expensive, unituivitely.
                     for rid in removed:
                         self.remove_by_id(rid)
-                    shedder_cooldown = 5
+                    latest_number_of_events = test_last_values.get(Metrics.PROCESSED_EVENTS, 0)
+                    #print("Shedding successful", file=sys.stderr)
                 except Exception:
                     pass
 

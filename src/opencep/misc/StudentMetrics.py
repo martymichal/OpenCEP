@@ -24,6 +24,10 @@ last_values = {
 }
 lock = Lock()
 
+test_last_values = {
+    Metrics.PROCESSED_EVENTS: 0,
+}
+
 
 def _log_metric(values: list[str]):
     assert len(values) == len(Fields)
@@ -36,6 +40,11 @@ def increment_counter(metric: Metrics, cur_time: int = 0):
     assert isinstance(metric, Metrics)
     cur_time = time.perf_counter_ns if cur_time == 0 else cur_time
     _log_metric([cur_time, "counter", str(metric), 1, 0, 0])
+
+    # for testing, should not affect existing functionality
+    if metric in test_last_values:
+        test_last_values[metric] += 1
+        #print(f"Test metric {metric} incremented to {test_last_values[metric]}")
 
 
 def mark_hist_point(metric: Metrics, value, attrs: dict[str, Any], cur_time: int = 0):

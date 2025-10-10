@@ -15,9 +15,9 @@ def slice_id(start_time: datetime.datetime, last_time: datetime.datetime):
     return NUM_OF_TIME_SLICES - 1
 
 def length_id(length: int):  # inverts the length value to favor longer matches
-    if length <= 1:
+    if length <= 2:
         return 2
-    elif length <= 2:
+    elif length <= 4:
         return 1
     else:
         return 0
@@ -44,7 +44,7 @@ class BucketManager:
             print("BucketManager: no buckets", file=sys.stderr)
             return
         print(
-            "BucketManager: listing buckets (bucket_id -> partial_ids)", file=sys.stderr
+            "BucketManager: listing buckets", file=sys.stderr
         )
         for bucket_id, partial_ids in sorted(self.buckets.items()):
             stats = self.stats.get(bucket_id)
@@ -166,6 +166,9 @@ class BucketManager:
         sorted_buckets = self.buckets_sorted_by_value(reverse=True)
         removed = []
         count = 0
+        print(f"  -- Current buckets before shedding:", file=sys.stderr)
+        for b_id, p_ids in self.buckets.items():
+            print(f"    Bucket {b_id}: {len(p_ids)} partials", file=sys.stderr)
         for bucket_id, _ in sorted_buckets:
             if n <= 0 and min_partials_removed <= 0:
                 break
@@ -186,6 +189,10 @@ class BucketManager:
             self.buckets.pop(bucket_id, None)
             self.stats.pop(bucket_id, None)
             n -= 1
+            print(f"  Shed bucket {bucket_id}, removed {len(partial_ids)} partials", file=sys.stderr)
+            print(f"  Current buckets after shedding:", file=sys.stderr)
+            for b_id, p_ids in self.buckets.items():
+                print(f"    Bucket {b_id}: {len(p_ids)} partials", file=sys.stderr)
             if min_partials_removed and count >= min_partials_removed:
                 break
         return removed
